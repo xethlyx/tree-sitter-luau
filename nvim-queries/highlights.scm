@@ -156,6 +156,11 @@
 
 (var (name) @variable)
 
+(local_var_stmt (binding) @variable)
+(for_in_stmt (binding) @variable)
+(fn_stmt table: (name) @variable)
+(for_range_stmt (binding) @variable)
+
 ((var (name) @variable.global
   (#any-of? @variable.global
   "_G" "_VERSION")))
