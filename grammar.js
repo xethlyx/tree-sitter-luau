@@ -163,13 +163,15 @@ module.exports = grammar({
       "/=",
       "%=",
       "^=",
-      "..="),
+      "..=",
+      "//="),
 
     exp: $ => choice(
       $.nil,
       $.boolean,
       $.number,
       $.string,
+      $.string_interp,
       $.vararg,
       $.callback,
       $.prefixexp,
@@ -195,6 +197,7 @@ module.exports = grammar({
         ["-", PREC.ADDSUB],
         ["*", PREC.MULDIV],
         ["/", PREC.MULDIV],
+        ["//", PREC.MULDIV],
         ["%", PREC.MULDIV]
       ].map(([op, pri]) =>
         prec.left(pri, seq( field("arg0", $.exp), field("op", op), field("arg1", $.exp) ))),
@@ -293,7 +296,7 @@ module.exports = grammar({
       $._type_typeof,
       $._type_func,
       $._type_table),*/
-    singleton: $ => choice($.string, $.nil),
+    singleton: $ => choice($.string, $.nil, $.boolean),
     namedtype: $ => prec.right(PREC.TYPEPARAM, seq(
       optional(seq(field("module", $.name), ".")),
       $.name,
@@ -373,6 +376,9 @@ module.exports = grammar({
     vararg: () => "...",
 
     string: $ => seq($._string_start, optional($._string_content), $._string_end),
+    
+    string_interp: $ => seq($.interp_start, repeat(choice($.interp_content, $.interp_exp)), $.interp_end),
+    interp_exp: $ => seq($.interp_brace_open, optional(field("expression", $.exp)), $.interp_brace_close),
 
     boolean: () => choice("true", "false"),
     nil: () => "nil",
@@ -390,7 +396,12 @@ module.exports = grammar({
     $._comment_end,
     $._string_start,
     $._string_content,
-    $._string_end],
+    $._string_end,
+    $.interp_start,
+    $.interp_content,
+    $.interp_brace_open,
+    $.interp_brace_close,
+    $.interp_end],
 
   inline: $ => [$.prefix, $.fieldsep],
 

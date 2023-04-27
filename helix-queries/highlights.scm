@@ -102,6 +102,7 @@
   "-"
   "*"
   "/"
+  "//"
   "%"
   "^"
   "#"
@@ -118,8 +119,10 @@
   "-="
   "*="
   "/="
+  "//="
   "%="
   "^="
+  "..="
   "->"
   "::"
   ".."
@@ -213,24 +216,24 @@
 
 (_ table: (name) @variable.builtin (#eq? @variable.builtin "utf8")
    . (name)? @function.builtin
-   (#match? @function.builtin "^(char|codepoint|codes|len|offset|nfcnormalize|nfdnormalize)$")
+   (#match? @function.builtin "^(char|charpattern|codepoint|codes|graphemes|len|offset|nfcnormalize|nfdnormalize)$")
 )
 
 (var . (name) @variable.builtin (#match? @variable.builtin "^(_G|_VERSION|self|bit32|coroutine|debug|math|os|string|table|task|utf8)$"))
 
 (field key: (name) @function.method value: (callback))
-(field key: (name) @variable.other.member)
-(var field: (name) @variable.other.member)
-
-((name) @constant
- (#match? @constant "^[A-Z][A-Z_0-9]*$"))
-
 (call_stmt invoked: (var (name) @function .))
 
 (call_stmt method: (name) @function.method)
 (fn_stmt method: (name) @function.method)
 (fn_stmt name: (name) @function)
 (local_fn_stmt (name) @function)
+
+(field key: (name) @variable.other.member)
+(var field: (name) @variable.other.member)
+
+((name) @constant
+ (#match? @constant "^[A-Z][A-Z_0-9]*$"))
 
 (table
 [
@@ -242,9 +245,15 @@
 
 (number) @constant.numeric
 
+(interp_start) @punctuation.special
+(interp_content) @string
+(interp_brace_open) @punctuation.special
+(interp_brace_close) @punctuation.special
+(interp_end) @punctuation.special
+
 (string) @string
 
-(var (name) @variable)
+(var (name) @variable !field)
 
 ;; Error
 (ERROR) @error
